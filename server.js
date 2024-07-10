@@ -1,22 +1,27 @@
 const express = require('express');
-const app = express();
 const mongoose = require('mongoose');
 const userRoute = require('./routes/userRoute');
 const authRoute = require('./routes/authRoute');
 const cors = require('cors');
+require('dotenv').config();
+
+const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use('/tasks', userRoute);
 app.use('/auth', authRoute);
 
-mongoose.connect("mongodb://127.0.0.1:27017/merndb")
+const PORT = process.env.PORT || 4000;
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/merndb";
+
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
-        console.log("Connection established");
-        app.listen(4000, () => {
-            console.log("Server is running on port 4000");
+        console.log(`Connected to MongoDB at ${MONGODB_URI}`);
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
         });
     })
     .catch((err) => {
-        console.log("Connection error", err);
+        console.error(`Failed to connect to MongoDB at ${MONGODB_URI}`, err);
     });
